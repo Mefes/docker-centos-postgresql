@@ -42,10 +42,17 @@ fi
 }
 
 
-__run_supervisor() {
-supervisord -n
+# __run_supervisor() {
+# supervisord -n
+# }
+__run(){
+echo configure postgresql.conf:
+sed -itmp -e 's/#listen_addresses = \x27localhost\x27/listen_addresses = \x27*\x27/g' /var/lib/pgsql/data/postgresql.conf
+
+echo run server:
+su postgres -c '/usr/pgsql-14/bin/postgres -D /var/lib/pgsql/data'
 }
 
 # Call all functions
 __create_user
-__run_supervisor
+__run

@@ -8,14 +8,16 @@ RUN sudo dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/E
 RUN sudo dnf -qy module disable postgresql
 RUN sudo dnf install -y postgresql14-server
 COPY postgresql-14-setup /usr/pgsql-14/bin/postgresql-14-setup
-# COPY postgresql.conf /var/lib/pgsql/data/postgresql.conf
+
 COPY start_postgres.sh /start_postgres.sh
 
 RUN sed -i 's/.*requiretty$/#Defaults requiretty/' /etc/sudoers
 RUN chown -R postgres.postgres /var/lib/pgsql
 RUN chmod +x /bin/postgresql-14-setup
-# RUN chown -v postgres.postgres /var/lib/pgsql/data/postgresql.conf
+
 RUN /usr/pgsql-14/bin/postgresql-14-setup initdb
+COPY postgresql.conf /var/lib/pgsql/data/postgresql.conf
+RUN chown -v postgres.postgres /var/lib/pgsql/data/postgresql.conf
 RUN sudo systemctl enable postgresql-14.service
 # RUN sudo service postgresql-14 start 
 RUN echo "host    all             all             0.0.0.0/0               md5" >> /var/lib/pgsql/data/pg_hba.conf
