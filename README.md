@@ -1,5 +1,4 @@
 # docker-centos-postgresql
-===========================
 
 Dockerfile to build PostgreSQL on latest CentOS
 
