@@ -8,7 +8,6 @@ PG_CONFDIR="/var/lib/pgsql/data"
 __create_user() {
   #Grant rights
   usermod -G wheel postgres
-
   # Check to see if we have pre-defined credentials to use
 if [ -n "${DB_USER}" ]; then
   if [ -z "${DB_PASS}" ]; then
@@ -21,7 +20,7 @@ if [ -n "${DB_USER}" ]; then
   fi
     echo "Creating user \"${DB_USER}\"..."
     echo "CREATE ROLE ${DB_USER} with CREATEROLE login superuser PASSWORD '${DB_PASS}';" |
-      sudo -u postgres -H postgres --single \
+      sudo -u postgres -H /usr/pgsql-14/bin/postgres --single \
        -c config_file=${PG_CONFDIR}/postgresql.conf -D ${PG_CONFDIR}
   
 fi
@@ -29,23 +28,23 @@ fi
 if [ -n "${DB_NAME}" ]; then
   echo "Creating database \"${DB_NAME}\"..."
   echo "CREATE DATABASE ${DB_NAME};" | \
-    sudo -u postgres -H postgres --single \
+    sudo -u postgres -H /usr/pgsql-14/bin/postgres --single \
      -c config_file=${PG_CONFDIR}/postgresql.conf -D ${PG_CONFDIR}
 
   if [ -n "${DB_USER}" ]; then
     echo "Granting access to database \"${DB_NAME}\" for user \"${DB_USER}\"..."
     echo "GRANT ALL PRIVILEGES ON DATABASE ${DB_NAME} to ${DB_USER};" |
-      sudo -u postgres -H postgres --single \
+      sudo -u postgres -H /usr/pgsql-14/bin/postgres --single \
       -c config_file=${PG_CONFDIR}/postgresql.conf -D ${PG_CONFDIR}
   fi
 fi
 }
 
-
-__run_supervisor() {
-supervisord -n
+__run(){
+echo run server:
+su postgres -c '/usr/pgsql-14/bin/postgres -D /var/lib/pgsql/data'
 }
 
 # Call all functions
 __create_user
-__run_supervisor
+__run
